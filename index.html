@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo 5 meses</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-size: 30px; 
+            background-color: #f0f0f0; 
+        }
+
+        #player {
+            position: absolute;
+            bottom: 30px; 
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            font-size: 40px; 
+            text-align: center;
+        }
+
+        #pauseButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            background-color: gray;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 20px;
+        }
+
+        #pauseMenu {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        #resumeButton {
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #movementJoystick {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+
+        .joystickButton {
+            cursor: pointer;
+            padding: 35px;
+            font-size: 24px;
+            background-color: gray;
+            border-radius: 50%;
+            margin: 0 150px;
+        }
+    </style>
+</head>
+<body>
+    <div id="player">👸🏾</div>
+    <div id="pauseButton">Pause</div>
+    <div id="pauseMenu">
+        <p>O jogo está pausado</p>
+        <button id="resumeButton">Continuar</button>
+    </div>
+    <div id="movementJoystick">
+        <div class="joystickButton" id="joystickLeftButton">◁</div>
+        <div class="joystickButton" id="joystickRightButton">▷</div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const playerWidth = player.offsetWidth;
+        let score = 0;
+        let gameInterval;
+
+        document.getElementById('pauseButton').addEventListener('click', togglePause);
+        document.getElementById('resumeButton').addEventListener('click', togglePause);
+
+        const joystickLeftButton = document.getElementById('joystickLeftButton');
+        const joystickRightButton = document.getElementById('joystickRightButton');
+
+        joystickLeftButton.addEventListener('touchstart', () => movePlayer(-1));
+        joystickRightButton.addEventListener('touchstart', () => movePlayer(1));
+
+        function movePlayer(direction) {
+            const playerPosition = parseInt(window.getComputedStyle(player).left);
+            const newPosition = playerPosition + direction * 15;
+
+            if (newPosition >= 0 && newPosition <= window.innerWidth - playerWidth) {
+                player.style.left = newPosition + 'px';
+            }
+        }
+
+        document.addEventListener('touchend', () => player.style.left = '50%');
+
+        function togglePause() {
+            const pauseMenu = document.getElementById('pauseMenu');
+            if (pauseMenu.style.display === 'none') {
+                clearInterval(gameInterval);
+                auseMenu.style.display = 'block';
+            } else {
+                gameInterval = setInterval(createObstacle, 1500);
+                pauseMenu.style.display = 'none';
+            }
+        }
+
+        function createObstacle() {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const obstacle = document.createElement('div');
+                    obstacle.className = 'obstacle';
+                    
+                    obstacle.innerHTML = '💘';
+                    obstacle.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+                    obstacle.style.top = '0px';
+                    document.body.appendChild(obstacle);
+
+                    const moveObstacle = setInterval(function() {
+                        const obstaclePosition = parseInt(window.getComputedStyle(obstacle).top);
+
+                        if (obstaclePosition < window.innerHeight) {
+                            obstacle.style.top = obstaclePosition + 15 + 'px';
+                        } else {
+                            clearInterval(moveObstacle);
+                            document.body.removeChild(obstacle);
+                            score += 10;
+
+                            if (score >= 153) {
+                                alert('feliz 5 meses meu amor!! 153 dias ao lado da mulher mais incrível do mundo, obrigado por tudo minha princesa, pela paciência, aprendizado e principalmente por estar curando feridas que você nem causou. Saiba que sou imensamente feliz por te ter na minha vida e não vejo a hora de tê-la nos meus braços e poder te dar todo o amor que existe em mim. Eu te amo pra sempre ^^');
+                                window.location.reload();
+                            }
+                        }
+
+                        const playerRect = player.getBoundingClientRect();
+                        const obstacleRect = obstacle.getBoundingClientRect();
+
+                        if (
+                            playerRect.bottom > obstacleRect.top &&
+                            playerRect.top < obstacleRect.bottom &&
+                            playerRect.right > obstacleRect.left &&
+                            playerRect.left < obstacleRect.right
+                        ) {
+                            clearInterval(moveObstacle);
+                            alert('hehe perdeu, mas eu deixo vc tentar de novo -.- Pontuação: ' + score);
+                            window.location.reload();
+                        }
+                    }, 30);  
+                }, i * 200); 
+            }
+        }
+
+        gameInterval = setInterval(createObstacle, 1500); 
+    </script>
+</body>
+</html>
